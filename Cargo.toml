@@ -1,0 +1,37 @@
+[package]
+name = "hanzo-tunnel"
+version = "0.1.0"
+edition = "2021"
+authors = ["Hanzo AI Inc"]
+license = "MIT"
+repository = "https://github.com/hanzoai/tunnel"
+homepage = "https://hanzo.ai"
+description = "Cloud tunnel client for Hanzo apps — register, stream, and remote-control local instances from app.hanzo.bot"
+
+[workspace]
+
+[features]
+default = ["reconnect"]
+reconnect = []
+mdns = ["dep:mdns-sd"]
+tls-rustls = ["dep:rustls"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["sync", "time", "rt", "macros", "process", "io-util"] }
+tokio-tungstenite = { version = "0.23", features = ["native-tls"] }
+futures = "0.3"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+tracing = "0.1"
+thiserror = "2"
+url = "2"
+http = "1"
+
+# Optional
+mdns-sd = { version = "0.11", optional = true }
+rustls = { version = "0.23", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util"] }

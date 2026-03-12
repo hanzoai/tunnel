@@ -1,0 +1,80 @@
+# Cloud Agent Bridge — runs agent-bridge.py in K8s to accept migrated sessions
+#
+# Each pod registers as a "cloud" app_kind node on the bot gateway.
+# Sessions can be checkpointed from Mac and restored here (or vice versa).
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-agent
+  namespace: hanzo
+  labels:
+    app: cloud-agent
+    app.kubernetes.io/name: cloud-agent
+    app.kubernetes.io/part-of: hanzo-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloud-agent
+  template:
+    metadata:
+      labels:
+        app: cloud-agent
+        app.kubernetes.io/name: cloud-agent
+        app.kubernetes.io/part-of: hanzo-platform
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: agent
+          image: ghcr.io/hanzoai/cloud-agent:latest
+          imagePullPolicy: Always
+          env:
+            - name: TUNNEL_URL
+              value: ws://bot-gateway/v1/tunnel
+            - name: APP_KIND
+              value: cloud
+            - name: INSTANCE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: WORKSPACE_DIR
+              value: /workspace
+            - name: S3_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hanzo-s3
+                  key: endpoint
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hanzo-s3
+                  key: access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hanzo-s3
+                  key: secret-key
+            - name: S3_BUCKET
+              value: hanzo-sessions
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bot-secrets
+                  key: ANTHROPIC_API_KEY
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: workspace
+          emptyDir:
+            sizeLimit: 5Gi
