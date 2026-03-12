@@ -104,6 +104,25 @@ pub struct TunnelConnection {
 }
 
 impl TunnelConnection {
+    /// Create a TunnelConnection from pre-built channels.
+    ///
+    /// Use this when you have a custom transport (e.g., ZT fabric) that
+    /// provides its own framing and want to plug into the same dispatch
+    /// infrastructure.
+    pub fn from_channels(
+        outgoing_tx: mpsc::Sender<Frame>,
+        incoming_rx: mpsc::Receiver<Frame>,
+        shutdown_tx: watch::Sender<bool>,
+        instance_id: String,
+    ) -> Self {
+        Self {
+            outgoing_tx,
+            incoming_rx: Mutex::new(incoming_rx),
+            shutdown_tx,
+            instance_id,
+        }
+    }
+
     /// Send an event to the cloud.
     pub async fn send_event(&self, event: &str, data: serde_json::Value) -> Result<(), TunnelError> {
         self.outgoing_tx
