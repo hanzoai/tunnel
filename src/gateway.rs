@@ -221,7 +221,7 @@ impl GatewayConnection {
 /// sending invoke results and receiving invoke requests.
 pub async fn connect_gateway(config: GatewayConfig) -> Result<GatewayConnection, TunnelError> {
     // Connect WebSocket.
-    let mut request = config
+    let request = config
         .url
         .as_str()
         .into_client_request()

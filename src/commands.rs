@@ -4,7 +4,7 @@
 //! Built-in commands for terminal, dev session, and system operations.
 
 use crate::gateway::{GatewayConnection, GatewayError, NodeInvokeRequest};
-use crate::protocol::{CommandPayload, EventPayload, Frame, ResponsePayload};
+use crate::protocol::{CommandPayload, Frame};
 use crate::terminal::{TerminalEvent, TerminalManager, TerminalOpenParams};
 use crate::TunnelConnection;
 use serde_json::Value;

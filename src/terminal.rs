@@ -4,11 +4,9 @@
 //! Each session has a unique ID and streams output as events.
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::collections::HashMap;
 use std::process::Stdio;
 use std::sync::Arc;
-use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::process::Command;
 use tokio::sync::{Mutex, mpsc, watch};
@@ -135,7 +133,7 @@ impl TerminalManager {
         let pid = child.id().unwrap_or(0);
 
         let (stdin_tx, mut stdin_rx) = mpsc::channel::<Vec<u8>>(256);
-        let (shutdown_tx, mut shutdown_rx) = watch::channel(false);
+        let (shutdown_tx, _shutdown_rx) = watch::channel(false);
 
         let mut child_stdin = child.stdin.take().ok_or("no stdin")?;
         let mut child_stdout = child.stdout.take().ok_or("no stdout")?;
