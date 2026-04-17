@@ -1,0 +1,9 @@
+.git
+*.md
+LICENSE
+.vscode/
+.idea/
+.env*
+__pycache__/
+*.pyc
+docs/
